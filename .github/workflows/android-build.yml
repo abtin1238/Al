@@ -8,7 +8,7 @@ on:
       zip_name:
         description: 'نام فایل زیپ پروژه در ریشه ریپو'
         required: false
-        default: 'NaviApp-stage1-ui.zip'
+        default: 'AbtinGPS-stage1-ui-v7.zip'
 
 jobs:
   build:
