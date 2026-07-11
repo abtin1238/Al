@@ -1,38 +1,33 @@
-name: Build Flutter APK
+name: Extract ZIP Keep Both
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
-  build:
+  extract:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.24.0"
-
       - name: Extract ZIP
         run: |
-          unzip -o abtin_navigator.zip -d project
+          mkdir extracted
+          unzip -o abtin_navigator.zip -d extracted
 
-      - name: Get packages
-        working-directory: project
+      - name: Copy extracted files
         run: |
-          flutter pub get
+          cp -r extracted/* .
 
-      - name: Build APK
-        working-directory: project
+      - name: Commit changes
         run: |
-          flutter build apk --release
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: abtin-navigator-apk
-          path: project/build/app/outputs/flutter-apk/app-release.apk
+          git add .
+          git commit -m "Extract zip files" || echo "No changes"
+          git push
