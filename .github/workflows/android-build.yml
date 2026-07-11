@@ -7,9 +7,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,11 +21,11 @@ jobs:
         run: |
           flutter create --platforms android --project-name abtin_navigator .
 
-      - name: Fix geolocator version
+      - name: Fix dependencies
         run: |
-          sed -i 's/geolocator:.*/geolocator: ^13.0.2/' pubspec.yaml
+          sed -i 's/geolocator:.*/geolocator: ^11.0.0/' pubspec.yaml
 
-      - name: Get Flutter packages
+      - name: Get packages
         run: |
           flutter pub get
 
