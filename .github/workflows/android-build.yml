@@ -1,6 +1,10 @@
-name: Flutter APK Build
+name: Android Build
 
 on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
   workflow_dispatch:
 
 jobs:
@@ -14,12 +18,12 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.0"
-          channel: stable
+          flutter-version: '3.32.0'
+          channel: 'stable'
+          cache: true
 
       - name: Recreate Android
-        run: |
-          flutter create --platforms android --project-name abtin_navigator .
+        run: flutter create --platforms android --project-name abtin_navigator .
 
       - name: Fix Android compileSdk
         run: |
@@ -27,15 +31,14 @@ jobs:
           sed -i 's/compileSdkVersion .*/compileSdkVersion 35/' android/app/build.gradle
 
       - name: Get packages
-        run: |
-          flutter pub get
+        run: flutter pub get
 
       - name: Build APK
-        run: |
-          flutter build apk --release
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: abtin-navigator-apk
+          name: app-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
