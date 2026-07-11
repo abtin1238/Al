@@ -1,69 +1,41 @@
-name: Build APK from Zip
+name: Build Flutter APK
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
-    inputs:
-      zip_name:
-        description: 'نام فایل زیپ پروژه در ریشه ریپو'
-        required: false
-        default: 'AbtinGPS-stage1-ui-v7.zip'
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Find project zip
-        id: findzip
-        run: |
-          ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
-          if [ -z "$ZIP_FILE" ]; then
-            echo "هیچ فایل زیپی در ریشه ریپو پیدا نشد!"
-            exit 1
-          fi
-          echo "zip_path=$ZIP_FILE" >> "$GITHUB_OUTPUT"
-          echo "Found zip: $ZIP_FILE"
-
-      - name: Extract project
-        run: |
-          mkdir -p extracted
-          unzip -q "${{ steps.findzip.outputs.zip_path }}" -d extracted
-          # اگر داخل زیپ یک پوشه واحد (مثلا NaviApp/) باشد، محتوای آن را یک سطح بالا می‌آوریم
-          INNER_DIR=$(find extracted -maxdepth 1 -mindepth 1 -type d | head -n 1)
-          if [ -f "extracted/settings.gradle.kts" ] || [ -f "extracted/build.gradle.kts" ]; then
-            mv extracted project
-          elif [ -n "$INNER_DIR" ] && [ -f "$INNER_DIR/settings.gradle.kts" ]; then
-            mv "$INNER_DIR" project
-          else
-            echo "ساختار پروژه Gradle در زیپ پیدا نشد"
-            find extracted -maxdepth 2
-            exit 1
-          fi
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          flutter-version: "3.24.0"
+          channel: stable
 
-      - name: Generate Gradle Wrapper
-        working-directory: project
-        run: gradle wrapper --gradle-version 8.7
+      - name: Extract project ZIP
+        run: |
+          unzip -o abtin_navigator.zip
 
-      - name: Grant execute permission for gradlew
-        working-directory: project
-        run: chmod +x gradlew
+      - name: Get packages
+        working-directory: abtin_navigator
+        run: |
+          flutter pub get
 
-      - name: Build debug APK
-        working-directory: project
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Build APK
+        working-directory: abtin_navigator
+        run: |
+          flutter build apk --release
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: navi-app-debug-apk
-          path: project/app/build/outputs/apk/debug/app-debug.apk
+          name: abtin-navigator-apk
+          path: abtin_navigator/build/app/outputs/flutter-apk/app-release.apk
