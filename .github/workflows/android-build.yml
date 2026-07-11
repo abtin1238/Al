@@ -3,8 +3,6 @@ name: Build Flutter APK
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
 
 jobs:
   build:
@@ -14,28 +12,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Show files
+        run: |
+          ls -la
+
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.24.0"
-          channel: stable
 
-      - name: Extract project ZIP
+      - name: Extract ZIP
         run: |
-          unzip -o abtin_navigator.zip
+          unzip -o abtin_navigator.zip -d project
 
-      - name: Get packages
-        working-directory: abtin_navigator
+      - name: Build
+        working-directory: project/abtin_navigator
         run: |
           flutter pub get
-
-      - name: Build APK
-        working-directory: abtin_navigator
-        run: |
           flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: abtin-navigator-apk
-          path: abtin_navigator/build/app/outputs/flutter-apk/app-release.apk
+          name: apk
+          path: project/abtin_navigator/build/app/outputs/flutter-apk/app-release.apk
