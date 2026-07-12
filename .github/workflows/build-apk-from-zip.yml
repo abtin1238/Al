@@ -36,7 +36,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: "3.24.0"
 
       # چون پوشه‌های android/ و ios/ در zip نیستند، اینجا ساخته می‌شوند.
       - name: Generate platform folders
