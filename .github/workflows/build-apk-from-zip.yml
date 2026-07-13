@@ -15,7 +15,7 @@ jobs:
       - name: Extract project from zip
         run: |
           mkdir -p extracted
-          unzip -oq abtin_navigator_fixed.zip -d extracted
+          unzip -oq abtin_navigator.zip -d extracted
           if [ ! -f extracted/pubspec.yaml ]; then
             inner_dir=$(find extracted -maxdepth 1 -mindepth 1 -type d | head -n 1)
             if [ -f "$inner_dir/pubspec.yaml" ]; then
