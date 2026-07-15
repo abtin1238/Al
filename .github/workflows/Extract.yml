@@ -17,7 +17,7 @@ jobs:
       - name: Extract ZIP
         run: |
           mkdir extracted
-          unzip -o abtin_navigator.zip -d extracted
+          unzip -o *.zip -d extracted
 
       - name: Copy extracted files
         run: |
