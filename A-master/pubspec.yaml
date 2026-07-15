@@ -1,0 +1,41 @@
+name: navi_app
+description: "اپلیکیشن مسیریابی با رابط کاربری فارسی، تم تیره شب."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_fonts: ^6.2.1
+  cupertino_icons: ^1.0.6
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.4
+  geolocator: ^12.0.0
+  http: ^1.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # اگر فونت فارسی سفارشی (مثل وزیر یا ایران‌سنس) به assets/fonts اضافه کردی،
+  # این بخش را از حالت کامنت خارج کن:
+  # fonts:
+  #   - family: Vazirmatn
+  #     fonts:
+  #       - asset: assets/fonts/Vazirmatn-Regular.ttf
+  #       - asset: assets/fonts/Vazirmatn-Bold.ttf
+  #         weight: 700
+
+  assets:
+    - assets/
+    - assets/maps/

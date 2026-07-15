@@ -1,0 +1,12 @@
+{
+    "name": "مسیریاب",
+    "short_name": "مسیریاب",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0A0E14",
+    "theme_color": "#0A0E14",
+    "description": "اپلیکیشن مسیریابی با رابط کاربری فارسی",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": []
+}
