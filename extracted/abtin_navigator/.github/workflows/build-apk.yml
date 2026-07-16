@@ -1,0 +1,65 @@
+name: Build Abtin APK (small, split-per-abi)
+
+# با هر push یا اجرای دستی، APKهای سبک (هر ABI جدا) ساخته و آپلود می‌شوند.
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.24.0"
+
+      # چون پوشه‌های android/ و ios/ در مخزن نیستند، اینجا ساخته می‌شوند.
+      - name: Generate platform folders
+        run: flutter create --platforms=android,ios --org ir.abtin --project-name abtin_navigator .
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos || true
+
+      - name: Unit & widget tests
+        run: flutter test
+
+      - name: Generate app icon (آبتین)
+        run: dart run flutter_launcher_icons
+
+      # فعال‌سازی R8/Shrink برای کاهش حجم (تزریق به build.gradle ساخته‌شده)
+      - name: Enable code & resource shrinking
+        run: |
+          GRADLE=android/app/build.gradle
+          if ! grep -q "minifyEnabled true" $GRADLE; then
+            sed -i '/release {/a\            minifyEnabled true\n            shrinkResources true\n            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"' $GRADLE
+          fi
+          cp build_config/proguard-rules.pro android/app/proguard-rules.pro || true
+
+      - name: Build split-per-abi release APKs
+        run: >
+          flutter build apk --release
+          --split-per-abi
+          --tree-shake-icons
+          --obfuscate
+          --split-debug-info=build/symbols
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: abtin-apks
+          path: build/app/outputs/flutter-apk/*.apk
